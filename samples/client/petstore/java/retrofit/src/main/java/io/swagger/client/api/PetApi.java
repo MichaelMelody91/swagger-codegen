@@ -6,9 +6,12 @@ import retrofit.Callback;
 import retrofit.http.*;
 import retrofit.mime.*;
 
+import io.swagger.client.model.AllPetsResponse;
 import java.io.File;
 import io.swagger.client.model.ModelApiResponse;
 import io.swagger.client.model.Pet;
+import io.swagger.client.model.SinglePetResponse;
+import io.swagger.client.model.SubCategory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +65,28 @@ public interface PetApi {
     @retrofit.http.Path("petId") Long petId, @retrofit.http.Header("api_key") String apiKey, Callback<Void> cb
   );
   /**
+   * 
+   * Sync method
+   * 
+   * @param body  (optional)
+   * @return ModelApiResponse
+   */
+  @POST("/pet/category")
+  ModelApiResponse doCategoryStuff(
+    @retrofit.http.Body SubCategory body
+  );
+
+  /**
+   * 
+   * Async method
+   * @param body  (optional)
+   * @param cb callback method
+   */
+  @POST("/pet/category")
+  void doCategoryStuff(
+    @retrofit.http.Body SubCategory body, Callback<ModelApiResponse> cb
+  );
+  /**
    * Finds Pets by status
    * Sync method
    * Multiple status values can be provided with comma separated strings
@@ -106,6 +131,25 @@ public interface PetApi {
     @retrofit.http.Query("tags") List<String> tags, Callback<List<Pet>> cb
   );
   /**
+   * 
+   * Sync method
+   * 
+   * @return AllPetsResponse
+   */
+  @GET("/allPets")
+  AllPetsResponse getAllPets();
+    
+
+  /**
+   * 
+   * Async method
+   * @param cb callback method
+   */
+  @GET("/allPets")
+  void getAllPets(
+    Callback<AllPetsResponse> cb
+  );
+  /**
    * Find pet by ID
    * Sync method
    * Returns a single pet
@@ -126,6 +170,25 @@ public interface PetApi {
   @GET("/pet/{petId}")
   void getPetById(
     @retrofit.http.Path("petId") Long petId, Callback<Pet> cb
+  );
+  /**
+   * 
+   * Sync method
+   * 
+   * @return SinglePetResponse
+   */
+  @GET("/randomPet")
+  SinglePetResponse getRandomPet();
+    
+
+  /**
+   * 
+   * Async method
+   * @param cb callback method
+   */
+  @GET("/randomPet")
+  void getRandomPet(
+    Callback<SinglePetResponse> cb
   );
   /**
    * Update an existing pet
@@ -189,7 +252,7 @@ public interface PetApi {
   @retrofit.http.Multipart
   @POST("/pet/{petId}/uploadImage")
   ModelApiResponse uploadFile(
-    @retrofit.http.Path("petId") Long petId, @retrofit.http.Part("additionalMetadata") String additionalMetadata, @retrofit.http.Part("file") File file
+    @retrofit.http.Path("petId") Long petId, @retrofit.http.Part("additionalMetadata") String additionalMetadata, @retrofit.http.Part("file") TypedFile file
   );
 
   /**
@@ -203,6 +266,6 @@ public interface PetApi {
   @retrofit.http.Multipart
   @POST("/pet/{petId}/uploadImage")
   void uploadFile(
-    @retrofit.http.Path("petId") Long petId, @retrofit.http.Part("additionalMetadata") String additionalMetadata, @retrofit.http.Part("file") File file, Callback<ModelApiResponse> cb
+    @retrofit.http.Path("petId") Long petId, @retrofit.http.Part("additionalMetadata") String additionalMetadata, @retrofit.http.Part("file") TypedFile file, Callback<ModelApiResponse> cb
   );
 }

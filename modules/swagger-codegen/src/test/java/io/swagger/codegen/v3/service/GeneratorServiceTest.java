@@ -12,10 +12,357 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 public class GeneratorServiceTest {
+
+
+    @Test(description = "test generator service with java")
+    public void testGeneratorService_notNullJacksonAnnotationJava_True() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("java")
+                .spec(loadSpecAsNode("3_0_0/issue-9203.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                                .addAdditionalProperty("notNullJacksonAnnotation", true)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/main/java/io/swagger/client/model/OrderLineAudit.java".equals(relPath)) {
+                Assert.assertTrue(FileUtils.readFileToString(f).contains("@JsonInclude(JsonInclude.Include.NON_NULL)"));
+                Assert.assertTrue(FileUtils.readFileToString(f).contains("import com.fasterxml.jackson.annotation.JsonInclude"));
+            }
+        }
+    }
+
+    @Test(description = "test generator service with java")
+    public void testGeneratorService_notNullJacksonAnnotationJava_False() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("java")
+                .spec(loadSpecAsNode("3_0_0/issue-9203.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                                .addAdditionalProperty("notNullJacksonAnnotation", false)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/main/java/io/swagger/client/model/OrderLineAudit.java".equals(relPath)) {
+                Assert.assertFalse(FileUtils.readFileToString(f).contains("@JsonInclude(JsonInclude.Include.NON_NULL)"));
+                Assert.assertFalse(FileUtils.readFileToString(f).contains("import com.fasterxml.jackson.annotation.JsonInclude"));
+            }
+        }
+    }
+
+
+    @Test(description = "test generator service with spring")
+    public void testGeneratorService_notNullJacksonAnnotationSpring_True() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("spring")
+                .spec(loadSpecAsNode("3_0_0/issue-9203.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                                .addAdditionalProperty("notNullJacksonAnnotation", true)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/main/java/io/swagger/client/model/OrderLineAudit.java".equals(relPath)) {
+                Assert.assertTrue(FileUtils.readFileToString(f).contains("@JsonInclude(JsonInclude.Include.NON_NULL)"));
+                Assert.assertTrue(FileUtils.readFileToString(f).contains("import com.fasterxml.jackson.annotation.JsonInclude"));
+            }
+        }
+    }
+
+    @Test(description = "test generator service with spring")
+    public void testGeneratorService_notNullJacksonAnnotationSpring_False() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("spring")
+                .spec(loadSpecAsNode("3_0_0/issue-9203.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                                .addAdditionalProperty("notNullJacksonAnnotation", false)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/main/java/io/swagger/client/model/OrderLineAudit.java".equals(relPath)) {
+                Assert.assertFalse(FileUtils.readFileToString(f).contains("@JsonInclude(JsonInclude.Include.NON_NULL)"));
+                Assert.assertFalse(FileUtils.readFileToString(f).contains("import com.fasterxml.jackson.annotation.JsonInclude"));
+            }
+        }
+    }
+
+    @Test(description = "test generator oneOf ComposedSchema Properties")
+    public void testGenerator_FlattenInlineComposedSchema() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("java")
+                .spec(loadSpecAsNode("3_0_0/FlattenComposedInlineSchema.yaml", true, false))
+                .options(
+                        new Options()
+                                .flattenInlineComposedSchema(true)
+                                .outputDir(path)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/main/java/io/swagger/client/model/ContactbasemodelAllOf1.java".equals(relPath)) {
+                Assert.assertTrue("/src/main/java/io/swagger/client/model/ContactbasemodelAllOf1.java".equals(relPath));
+            }
+            if ("/src/main/java/io/swagger/client/model/TestOneOf2.java".equals(relPath)) {
+                Assert.assertTrue("/src/main/java/io/swagger/client/model/TestOneOf2.java".equals(relPath));
+            }
+        }
+
+    }
+
+    @Test(description = "test generator oneOf ComposedSchema Properties")
+    public void testGenerator_OneOf_ComposedSchemaProperties() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("html")
+                .spec(loadSpecAsNode("3_0_0/OneOfPropertiesIssue.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/index.html".equals(relPath)) {
+                //val_Member unique property
+                Assert.assertTrue(FileUtils.readFileToString(f).contains("val_unique_reference"));
+                //val_Member_Product unique property
+                Assert.assertTrue(FileUtils.readFileToString(f).contains("val_property_1"));
+            }
+        }
+
+    }
+
+    @Test(description = "test generator service with jaxrs-cxf-client")
+    public void testGeneratorService_Jaxrs_cxf_client() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("jaxrs-cxf-client")
+                .spec(loadSpecAsNode("3_0_0/issue-9203.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/gen/java/io/swagger/model/OrderLineAudit.java".equals(relPath)) {
+                Assert.assertFalse(FileUtils.readFileToString(f).contains("isisProcessed"));
+            }
+        }
+
+    }
+
+    @Test(description = "test generator service with jaxrs-cxf-cdi")
+    public void testGeneratorService_Jaxrs_cxf_cdi() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("jaxrs-cxf-cdi")
+                .spec(loadSpecAsNode("3_0_0/issue-9203.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/gen/java/io/swagger/model/OrderLineAudit.java".equals(relPath)) {
+                Assert.assertFalse(FileUtils.readFileToString(f).contains("isisProcessed"));
+            }
+        }
+
+    }
+
+    @Test(description = "test generator service with jaxrs-resteasy-eap")
+    public void testGeneratorService_Jaxrs_resteasy_eap() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("jaxrs-resteasy-eap")
+                .spec(loadSpecAsNode("3_0_0/issue-9203.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/gen/java/io/swagger/model/OrderLineAudit.java".equals(relPath)) {
+                Assert.assertFalse(FileUtils.readFileToString(f).contains("isisProcessed"));
+            }
+        }
+    }
+
+    @Test(description = "test generator service with jaxrs-resteasy")
+    public void testGeneratorService_Jaxrs_resteasy() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("jaxrs-resteasy")
+                .spec(loadSpecAsNode("3_0_0/issue-9203.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/gen/java/io/swagger/model/OrderLineAudit.java".equals(relPath)) {
+                Assert.assertFalse(FileUtils.readFileToString(f).contains("isisProcessed"));
+            }
+        }
+    }
+
+    @Test(description = "test generator service with jaxrs-spec")
+    public void testGeneratorService_Jaxrs_spec() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("jaxrs-spec")
+                .spec(loadSpecAsNode("3_0_0/issue-9203.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/gen/java/io/swagger/model/OrderLineAudit.java".equals(relPath)) {
+                Assert.assertFalse(FileUtils.readFileToString(f).contains("isisProcessed"));
+            }
+        }
+    }
+
+    @Test(description = "test generator service with spring")
+    public void testGeneratorService_JavaSpring() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.CLIENT)
+                .lang("spring")
+                .spec(loadSpecAsNode("3_0_0/issue-9203.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/gen/java/io/swagger/model/OrderLineAudit.java".equals(relPath)) {
+                Assert.assertFalse(FileUtils.readFileToString(f).contains("isisProcessed"));
+            }
+        }
+    }
+
+    @Test(description = "test generator service with spring")
+    public void testGeneratorService_JavaSpringPetStore() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.SERVER)
+                .lang("spring")
+                .spec(loadSpecAsNode("2_0/petstore.yaml", true, true))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                );
+
+        List<File> files = new GeneratorService().generationRequest(request).generate();
+        Assert.assertFalse(files.isEmpty());
+        for (File f: files) {
+            String relPath = f.getAbsolutePath().substring(path.length());
+            if ("/src/main/java/io/swagger/model/Order.java".equals(relPath)) {
+                Assert.assertTrue(FileUtils.readFileToString(f).contains("isComplete"));
+            }
+        }
+    }
 
     @Test(description = "test generator service with java 3.0")
     public void testGeneratorServiceJava3() {
@@ -179,6 +526,102 @@ public class GeneratorServiceTest {
                 );
         List<File> files = new GeneratorService().generationRequest(request).generate();
         Assert.assertFalse(files.isEmpty());
+    }
+
+    @Test(description = "test generator service resolved spec (openapi, openapi-yaml")
+    public void testGeneratorService_ResolvedSpec() throws IOException {
+
+        String path = getTmpFolder().getAbsolutePath();
+        GenerationRequest request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.DOCUMENTATION)
+                .lang("openapi")
+                .spec(loadSpecAsNode("3_0_0/flattentest.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                                .addAdditionalProperty("flattenSpec", false)
+                );
+
+        new GeneratorService().generationRequest(request).generate();
+        String spec = FileUtils.readFileToString(new File(path + File.separator + "openapi.json"));
+        Assert.assertFalse(spec.contains("#/components/schemas/inline_response_200"));
+        Assert.assertFalse(spec.contains("#/components/schemas/body"));
+
+        path = getTmpFolder().getAbsolutePath();
+        request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.DOCUMENTATION)
+                .lang("openapi-yaml")
+                .spec(loadSpecAsNode("3_0_0/flattentest.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                                .addAdditionalProperty("flattenSpec", "false")
+                );
+
+
+        new GeneratorService().generationRequest(request).generate();
+        spec = FileUtils.readFileToString(new File(path + File.separator + "openapi.yaml"));
+        Assert.assertFalse(spec.contains("#/components/schemas/inline_response_200"));
+        Assert.assertFalse(spec.contains("#/components/schemas/body"));
+
+
+        path = getTmpFolder().getAbsolutePath();
+        request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.DOCUMENTATION)
+                .lang("openapi")
+                .spec(loadSpecAsNode("3_0_0/flattentest.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                );
+
+        new GeneratorService().generationRequest(request).generate();
+        spec = FileUtils.readFileToString(new File(path + File.separator + "openapi.json"));
+        Assert.assertTrue(spec.contains("#/components/schemas/inline_response_200"));
+        Assert.assertTrue(spec.contains("#/components/schemas/body"));
+
+
+        path = getTmpFolder().getAbsolutePath();
+        request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.DOCUMENTATION)
+                .lang("openapi-yaml")
+                .spec(loadSpecAsNode("3_0_0/flattentest.yaml", true, false))
+                .options(
+                        new Options()
+                                .outputDir(path)
+                );
+
+        new GeneratorService().generationRequest(request).generate();
+        spec = FileUtils.readFileToString(new File(path + File.separator + "openapi.yaml"));
+        Assert.assertTrue(spec.contains("#/components/schemas/inline_response_200"));
+        Assert.assertTrue(spec.contains("#/components/schemas/body"));
+        
+        path = getTmpFolder().getAbsolutePath();
+        request = new GenerationRequest();
+        request
+                .codegenVersion(GenerationRequest.CodegenVersion.V3)
+                .type(GenerationRequest.Type.DOCUMENTATION)
+                .lang("openapi-yaml")
+                .specURL("src/test/resources/3_0_0/resolvefullytest.yaml")
+                .options(
+                        new Options()
+                                .outputDir(path)
+                                .resolveFully(true)
+                );
+
+
+        new GeneratorService().generationRequest(request).generate();
+        spec = FileUtils.readFileToString(new File(path + File.separator + "openapi.yaml"));
+        Assert.assertTrue(spec.contains("additionalProperties: true"));
+
     }
 
     protected static File getTmpFolder() {

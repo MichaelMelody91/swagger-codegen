@@ -3,9 +3,12 @@ package io.swagger.client.api;
 import io.swagger.client.ApiClient;
 import io.swagger.client.EncodingUtils;
 
+import io.swagger.client.model.AllPetsResponse;
 import java.io.File;
 import io.swagger.client.model.ModelApiResponse;
 import io.swagger.client.model.Pet;
+import io.swagger.client.model.SinglePetResponse;
+import io.swagger.client.model.SubCategory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +25,7 @@ public interface PetApi extends ApiClient.Api {
    */
   @RequestLine("POST /pet")
   @Headers({
+      "Content-Type: application/json",
       "Accept: */*",
   })
   void addPet(Pet body);
@@ -33,10 +37,23 @@ public interface PetApi extends ApiClient.Api {
    */
   @RequestLine("DELETE /pet/{petId}")
   @Headers({
+      "Content-Type: application/json",
       "Accept: */*",
     "api_key: {apiKey}"
   })
   void deletePet(@Param("petId") Long petId, @Param("apiKey") String apiKey);
+  /**
+   * 
+   * 
+   * @param body  (optional)
+   * @return ModelApiResponse
+   */
+  @RequestLine("POST /pet/category")
+  @Headers({
+      "Content-Type: application/json",
+      "Accept: application/json",
+  })
+  ModelApiResponse doCategoryStuff(SubCategory body);
   /**
    * Finds Pets by status
    * Multiple status values can be provided with comma separated strings
@@ -45,7 +62,7 @@ public interface PetApi extends ApiClient.Api {
    */
   @RequestLine("GET /pet/findByStatus?status={status}")
   @Headers({
-      "Accept: */*",
+      "Accept: application/json",
   })
   List<Pet> findPetsByStatus(@Param("status") List<String> status);
 
@@ -68,6 +85,7 @@ public interface PetApi extends ApiClient.Api {
   @RequestLine("GET /pet/findByStatus?status={status}")
   @Headers({
       "Content-Type: */*",
+      "Accept: application/json",
   })
   List<Pet> findPetsByStatus(@QueryMap(encoded=true) Map<String, Object> queryParams);
 
@@ -89,7 +107,7 @@ public interface PetApi extends ApiClient.Api {
    */
   @RequestLine("GET /pet/findByTags?tags={tags}")
   @Headers({
-      "Accept: */*",
+      "Accept: application/json",
   })
   List<Pet> findPetsByTags(@Param("tags") List<String> tags);
 
@@ -112,6 +130,7 @@ public interface PetApi extends ApiClient.Api {
   @RequestLine("GET /pet/findByTags?tags={tags}")
   @Headers({
       "Content-Type: */*",
+      "Accept: application/json",
   })
   List<Pet> findPetsByTags(@QueryMap(encoded=true) Map<String, Object> queryParams);
 
@@ -126,6 +145,16 @@ public interface PetApi extends ApiClient.Api {
     }
   }
   /**
+   * 
+   * 
+   * @return AllPetsResponse
+   */
+  @RequestLine("GET /allPets")
+  @Headers({
+      "Accept: application/json",
+  })
+  AllPetsResponse getAllPets();
+  /**
    * Find pet by ID
    * Returns a single pet
    * @param petId ID of pet to return (required)
@@ -133,9 +162,19 @@ public interface PetApi extends ApiClient.Api {
    */
   @RequestLine("GET /pet/{petId}")
   @Headers({
-      "Accept: */*",
+      "Accept: application/json",
   })
   Pet getPetById(@Param("petId") Long petId);
+  /**
+   * 
+   * 
+   * @return SinglePetResponse
+   */
+  @RequestLine("GET /randomPet")
+  @Headers({
+      "Accept: application/json",
+  })
+  SinglePetResponse getRandomPet();
   /**
    * Update an existing pet
    * 
@@ -143,6 +182,7 @@ public interface PetApi extends ApiClient.Api {
    */
   @RequestLine("PUT /pet")
   @Headers({
+      "Content-Type: application/json",
       "Accept: */*",
   })
   void updatePet(Pet body);
@@ -155,6 +195,7 @@ public interface PetApi extends ApiClient.Api {
    */
   @RequestLine("POST /pet/{petId}")
   @Headers({
+      "Content-Type: application/x-www-form-urlencoded",
       "Accept: */*",
   })
   void updatePetWithForm(@Param("petId") Long petId, @Param("name") String name, @Param("status") String status);
@@ -168,7 +209,8 @@ public interface PetApi extends ApiClient.Api {
    */
   @RequestLine("POST /pet/{petId}/uploadImage")
   @Headers({
-      "Accept: */*",
+      "Content-Type: multipart/form-data",
+      "Accept: application/json",
   })
   ModelApiResponse uploadFile(@Param("petId") Long petId, @Param("additionalMetadata") String additionalMetadata, @Param("file") File file);
 }

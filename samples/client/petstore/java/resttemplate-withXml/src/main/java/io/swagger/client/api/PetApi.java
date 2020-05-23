@@ -2,9 +2,12 @@ package io.swagger.client.api;
 
 import io.swagger.client.ApiClient;
 
+import io.swagger.client.model.AllPetsResponse;
 import java.io.File;
 import io.swagger.client.model.ModelApiResponse;
 import io.swagger.client.model.Pet;
+import io.swagger.client.model.SinglePetResponse;
+import io.swagger.client.model.SubCategory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +70,9 @@ public class PetApi {
 
         final String[] accepts = {  };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
-        final String[] contentTypes = {  };
+        final String[] contentTypes = { 
+            "application/json", "application/xml"
+         };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
 
         String[] authNames = new String[] { "petstore_auth" };
@@ -111,6 +116,36 @@ public class PetApi {
         apiClient.invokeAPI(path, HttpMethod.DELETE, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**
+     * 
+     * 
+     * <p><b>200</b> - successful operation
+     * @param body The body parameter
+     * @return ModelApiResponse
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ModelApiResponse doCategoryStuff(SubCategory body) throws RestClientException {
+        Object postBody = body;
+        String path = UriComponentsBuilder.fromPath("/pet/category").build().toUriString();
+        
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders headerParams = new HttpHeaders();
+        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+
+        final String[] accepts = { 
+            "application/json"
+         };
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
+        final String[] contentTypes = { 
+            "application/json"
+         };
+        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+
+        String[] authNames = new String[] {  };
+
+        ParameterizedTypeReference<ModelApiResponse> returnType = new ParameterizedTypeReference<ModelApiResponse>() {};
+        return apiClient.invokeAPI(path, HttpMethod.POST, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+    }
+    /**
      * Finds Pets by status
      * Multiple status values can be provided with comma separated strings
      * <p><b>200</b> - successful operation
@@ -132,7 +167,9 @@ public class PetApi {
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
         queryParams.putAll(apiClient.parameterToMultiValueMap(ApiClient.CollectionFormat.valueOf("csv".toUpperCase()), "status", status));
 
-        final String[] accepts = {  };
+        final String[] accepts = { 
+            "application/xml", "application/json"
+         };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
         final String[] contentTypes = {  };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
@@ -164,7 +201,9 @@ public class PetApi {
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
         queryParams.putAll(apiClient.parameterToMultiValueMap(ApiClient.CollectionFormat.valueOf("csv".toUpperCase()), "tags", tags));
 
-        final String[] accepts = {  };
+        final String[] accepts = { 
+            "application/xml", "application/json"
+         };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
         final String[] contentTypes = {  };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
@@ -172,6 +211,33 @@ public class PetApi {
         String[] authNames = new String[] { "petstore_auth" };
 
         ParameterizedTypeReference<List<Pet>> returnType = new ParameterizedTypeReference<List<Pet>>() {};
+        return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+    }
+    /**
+     * 
+     * 
+     * <p><b>200</b> - a single random pet
+     * @return AllPetsResponse
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public AllPetsResponse getAllPets() throws RestClientException {
+        Object postBody = null;
+        String path = UriComponentsBuilder.fromPath("/allPets").build().toUriString();
+        
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders headerParams = new HttpHeaders();
+        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+
+        final String[] accepts = { 
+            "application/json"
+         };
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
+        final String[] contentTypes = {  };
+        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+
+        String[] authNames = new String[] {  };
+
+        ParameterizedTypeReference<AllPetsResponse> returnType = new ParameterizedTypeReference<AllPetsResponse>() {};
         return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**
@@ -199,7 +265,9 @@ public class PetApi {
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
 
-        final String[] accepts = {  };
+        final String[] accepts = { 
+            "application/xml", "application/json"
+         };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
         final String[] contentTypes = {  };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
@@ -207,6 +275,33 @@ public class PetApi {
         String[] authNames = new String[] { "api_key" };
 
         ParameterizedTypeReference<Pet> returnType = new ParameterizedTypeReference<Pet>() {};
+        return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+    }
+    /**
+     * 
+     * 
+     * <p><b>200</b> - a single random pet
+     * @return SinglePetResponse
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public SinglePetResponse getRandomPet() throws RestClientException {
+        Object postBody = null;
+        String path = UriComponentsBuilder.fromPath("/randomPet").build().toUriString();
+        
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders headerParams = new HttpHeaders();
+        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+
+        final String[] accepts = { 
+            "application/json"
+         };
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
+        final String[] contentTypes = {  };
+        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+
+        String[] authNames = new String[] {  };
+
+        ParameterizedTypeReference<SinglePetResponse> returnType = new ParameterizedTypeReference<SinglePetResponse>() {};
         return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**
@@ -232,7 +327,9 @@ public class PetApi {
 
         final String[] accepts = {  };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
-        final String[] contentTypes = {  };
+        final String[] contentTypes = { 
+            "application/json", "application/xml"
+         };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
 
         String[] authNames = new String[] { "petstore_auth" };
@@ -270,7 +367,9 @@ public class PetApi {
 
         final String[] accepts = {  };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
-        final String[] contentTypes = {  };
+        final String[] contentTypes = { 
+            "application/x-www-form-urlencoded"
+         };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
 
         String[] authNames = new String[] { "petstore_auth" };
@@ -305,11 +404,15 @@ public class PetApi {
         if (additionalMetadata != null)
             formParams.add("additionalMetadata", additionalMetadata);
         if (file != null)
-            formParams.add("file", file);
+            formParams.add("file", new FileSystemResource(file));
 
-        final String[] accepts = {  };
+        final String[] accepts = { 
+            "application/json"
+         };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
-        final String[] contentTypes = {  };
+        final String[] contentTypes = { 
+            "multipart/form-data"
+         };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
 
         String[] authNames = new String[] { "petstore_auth" };

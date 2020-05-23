@@ -136,9 +136,23 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
     private void configureGeneratorProperties() {
         // allows generating only models by specifying a CSV of models to generate, or empty for all
         // NOTE: Boolean.TRUE is required below rather than `true` because of JVM boxing constraints and type inference.
-        generateApis = System.getProperty(CodegenConstants.APIS) != null ? Boolean.TRUE : getGeneratorPropertyDefaultSwitch(CodegenConstants.APIS, null);
-        generateModels = System.getProperty(CodegenConstants.MODELS) != null ? Boolean.TRUE : getGeneratorPropertyDefaultSwitch(CodegenConstants.MODELS, null);
-        generateSupportingFiles = System.getProperty(CodegenConstants.SUPPORTING_FILES) != null ? Boolean.TRUE : getGeneratorPropertyDefaultSwitch(CodegenConstants.SUPPORTING_FILES, null);
+
+        if (System.getProperty(CodegenConstants.GENERATE_APIS) != null) {
+            generateApis = Boolean.valueOf(System.getProperty(CodegenConstants.GENERATE_APIS));
+        } else {
+            generateApis = System.getProperty(CodegenConstants.APIS) != null ? Boolean.TRUE : getGeneratorPropertyDefaultSwitch(CodegenConstants.APIS, null);
+        }
+        if (System.getProperty(CodegenConstants.GENERATE_MODELS) != null) {
+            generateModels = Boolean.valueOf(System.getProperty(CodegenConstants.GENERATE_MODELS));
+        } else {
+            generateModels = System.getProperty(CodegenConstants.MODELS) != null ? Boolean.TRUE : getGeneratorPropertyDefaultSwitch(CodegenConstants.MODELS, null);
+        }
+        String supportingFilesProperty = System.getProperty(CodegenConstants.SUPPORTING_FILES);
+        if (((supportingFilesProperty != null) && supportingFilesProperty.equalsIgnoreCase("false"))) {
+            generateSupportingFiles = false;
+        } else {
+            generateSupportingFiles = supportingFilesProperty != null ? Boolean.TRUE : getGeneratorPropertyDefaultSwitch(CodegenConstants.SUPPORTING_FILES, null);
+        }
 
         if (generateApis == null && generateModels == null && generateSupportingFiles == null) {
             // no specifics are set, generate everything
@@ -156,11 +170,23 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         }
         // model/api tests and documentation options rely on parent generate options (api or model) and no other options.
         // They default to true in all scenarios and can only be marked false explicitly
-        final Boolean generateModelTestsOption = getCustomOptionBooleanValue(CodegenConstants.MODEL_TESTS_OPTION);
-        final Boolean generateModelDocsOption = getCustomOptionBooleanValue(CodegenConstants.MODEL_DOCS_OPTION);
-        final Boolean generateAPITestsOption = getCustomOptionBooleanValue(CodegenConstants.API_TESTS_OPTION);
-        final Boolean generateAPIDocsOption = getCustomOptionBooleanValue(CodegenConstants.API_DOCS_OPTION);
-        final Boolean useOas2Option = getCustomOptionBooleanValue(CodegenConstants.USE_OAS2_OPTION);
+        Boolean generateModelTestsOption = getCustomOptionBooleanValue(CodegenConstants.MODEL_TESTS_OPTION);
+        if (generateModelTestsOption == null) {
+            generateModelTestsOption = System.getProperty(CodegenConstants.MODEL_TESTS) != null ? Boolean.valueOf(System.getProperty(CodegenConstants.MODEL_TESTS)) : null;
+        }
+        Boolean generateModelDocsOption = getCustomOptionBooleanValue(CodegenConstants.MODEL_DOCS_OPTION);
+        if (generateModelDocsOption == null) {
+            generateModelDocsOption = System.getProperty(CodegenConstants.MODEL_DOCS) != null ? Boolean.valueOf(System.getProperty(CodegenConstants.MODEL_DOCS)) : null;
+        }
+        Boolean generateAPITestsOption = getCustomOptionBooleanValue(CodegenConstants.API_TESTS_OPTION);
+        if (generateAPITestsOption == null) {
+            generateAPITestsOption = System.getProperty(CodegenConstants.API_TESTS) != null ? Boolean.valueOf(System.getProperty(CodegenConstants.API_TESTS)) : null;
+        }
+        Boolean generateAPIDocsOption = getCustomOptionBooleanValue(CodegenConstants.API_DOCS_OPTION);
+        if (generateAPIDocsOption == null) {
+            generateAPIDocsOption = System.getProperty(CodegenConstants.API_DOCS) != null ? Boolean.valueOf(System.getProperty(CodegenConstants.API_DOCS)) : null;
+        }
+        Boolean useOas2Option = getCustomOptionBooleanValue(CodegenConstants.USE_OAS2_OPTION);
 
         generateModelTests = generateModelTestsOption != null ? generateModelTestsOption : getGeneratorPropertyDefaultSwitch(CodegenConstants.MODEL_TESTS, true);
         generateModelDocumentation = generateModelDocsOption != null ? generateModelDocsOption : getGeneratorPropertyDefaultSwitch(CodegenConstants.MODEL_DOCS, true);
@@ -339,7 +365,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         for (String name : modelKeys) {
             try {
                 //don't generate models that have an import mapping
-                if(config.importMapping().containsKey(name)) {
+                if(!config.getIgnoreImportMapping() && config.importMapping().containsKey(name)) {
                     LOGGER.info("Model " + name + " not imported due to import mapping");
                     continue;
                 }
@@ -356,26 +382,22 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
                 if (modelList == null || modelList.isEmpty()) {
                     continue;
                 }
-
-                for (Object object : modelList) {
-                    Map<String, Object> modelMap = (Map<String, Object>) object;
-                    CodegenModel codegenModel = null;
-                    if (modelMap.containsKey("oneOf-model")) {
-                        codegenModel = (CodegenModel) modelMap.get("oneOf-model");
-                    }
-                    if (modelMap.containsKey("anyOf-model")) {
-                        codegenModel = (CodegenModel) modelMap.get("anyOf-model");
-                    }
-                    if (codegenModel != null) {
-                        models = processModel(codegenModel, config, schemas);
-                        models.put("classname", config.toModelName(codegenModel.name));
-                        models.putAll(config.additionalProperties());
-                        allProcessedModels.put(codegenModel.name, models);
-                        break;
-                    }
-                }
             } catch (Exception e) {
                 throw new RuntimeException("Could not process model '" + name + "'" + ".Please make sure that your schema is correct!", e);
+            }
+        }
+
+        final ISchemaHandler schemaHandler = config.getSchemaHandler();
+        schemaHandler.readProcessedModels(allProcessedModels);
+
+        final List<CodegenModel> composedModels = schemaHandler.getModels();
+
+         if (composedModels != null && !composedModels.isEmpty()) {
+            for (CodegenModel composedModel : composedModels) {
+                final Map<String, Object> models = processModel(composedModel, config, schemas);
+                models.put("classname", config.toModelName(composedModel.name));
+                models.putAll(config.additionalProperties());
+                allProcessedModels.put(composedModel.name, models);
             }
         }
 
@@ -387,11 +409,11 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
             Map<String, Object> models = (Map<String, Object>)allProcessedModels.get(modelName);
             try {
                 //don't generate models that have an import mapping
-                if(config.importMapping().containsKey(modelName)) {
+                if(!config.getIgnoreImportMapping() && config.importMapping().containsKey(modelName)) {
                     continue;
                 }
                 Map<String, Object> modelTemplate = (Map<String, Object>) ((List<Object>) models.get("models")).get(0);
-                if (isJavaCodegen(config.getName())) {
+                if (isAliasVerifierGenerator(config.getName())) {
                     // Special handling of aliases only applies to Java
                     if (modelTemplate != null && modelTemplate.containsKey("model")) {
                         CodegenModel codegenModel = (CodegenModel) modelTemplate.get("model");
@@ -470,6 +492,8 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
                     }
                 });
                 Map<String, Object> operation = processOperations(config, tag, ops, allModels);
+
+                processSecurityProperties(operation);
 
                 operation.put("basePath", basePath);
                 operation.put("basePathWithoutHost", basePathWithoutHost);
@@ -568,7 +592,10 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         }
         Set<String> supportingFilesToGenerate = null;
         String supportingFiles = System.getProperty(CodegenConstants.SUPPORTING_FILES);
-        if (supportingFiles != null && !supportingFiles.isEmpty()) {
+        boolean generateAll = false;
+        if (supportingFiles != null && supportingFiles.equalsIgnoreCase("true")) {
+            generateAll = true;
+        } else if (supportingFiles != null && !supportingFiles.isEmpty()) {
             supportingFilesToGenerate = new HashSet<>(Arrays.asList(supportingFiles.split(",")));
         }
 
@@ -595,7 +622,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
                 }
 
                 boolean shouldGenerate = true;
-                if(supportingFilesToGenerate != null && !supportingFilesToGenerate.isEmpty()) {
+                if(!generateAll && supportingFilesToGenerate != null && !supportingFilesToGenerate.isEmpty()) {
                     shouldGenerate = supportingFilesToGenerate.contains(support.destinationFilename);
                 }
                 if (!shouldGenerate){
@@ -714,12 +741,8 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         bundle.put("apiFolder", config.apiPackage().replace('.', File.separatorChar));
         bundle.put("modelPackage", config.modelPackage());
 
-        final Map<String, SecurityScheme> securitySchemeMap = openAPI.getComponents() != null ? openAPI.getComponents().getSecuritySchemes() : null;
-        final List<CodegenSecurity> authMethods = config.fromSecurity(securitySchemeMap);
-        if (authMethods != null && !authMethods.isEmpty()) {
-            bundle.put("authMethods", authMethods);
-            bundle.put("hasAuthMethods", true);
-        }
+        processSecurityProperties(bundle);
+
         if (openAPI.getExternalDocs() != null) {
             bundle.put("externalDocs", openAPI.getExternalDocs());
         }
@@ -988,7 +1011,9 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
             CodegenModel cm = config.fromModel(key, schema, allDefinitions);
             Map<String, Object> mo = new HashMap<>();
             mo.put("model", cm);
+            mo.put("schema", schema);
             mo.put("importPath", config.toModelImport(cm.classname));
+            /**
             if (cm.vendorExtensions.containsKey("oneOf-model")) {
                 CodegenModel oneOfModel = (CodegenModel) cm.vendorExtensions.get("oneOf-model");
                 mo.put("oneOf-model", oneOfModel);
@@ -997,6 +1022,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
                 CodegenModel anyOfModel = (CodegenModel) cm.vendorExtensions.get("anyOf-model");
                 mo.put("anyOf-model", anyOfModel);
             }
+            */
             models.add(mo);
 
             allImports.addAll(cm.imports);
@@ -1033,9 +1059,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         objs.put("package", config.modelPackage());
         List<Object> models = new ArrayList<>();
 
-        if (codegenModel.vendorExtensions.containsKey("x-is-composed-model")) {
-            objs.put("x-is-composed-model", codegenModel.vendorExtensions.get("x-is-composed-model"));
-        }
+        objs.put("x-is-composed-model", codegenModel.isComposedModel);
 
         Map<String, Object> modelObject = new HashMap<>();
         modelObject.put("model", codegenModel);
@@ -1088,9 +1112,12 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         return authMethods;
     }
 
-    private boolean isJavaCodegen(String name) {
+    private boolean isAliasVerifierGenerator(String name) {
         return name.equalsIgnoreCase("java")
-                || name.equalsIgnoreCase("inflector");
+                || name.equalsIgnoreCase("inflector")
+                || name.equalsIgnoreCase("csharp")
+                || name.equalsIgnoreCase("go")
+                || name.equalsIgnoreCase("go-server");
     }
 
     private Boolean getCustomOptionBooleanValue(String option) {
@@ -1107,4 +1134,14 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         }
         return Boolean.valueOf(optionalCodegenArgument.get().getValue());
     }
+
+    protected void processSecurityProperties (Map<String, Object> bundle) {
+        final Map<String, SecurityScheme> securitySchemeMap = openAPI.getComponents() != null ? openAPI.getComponents().getSecuritySchemes() : null;
+        final List<CodegenSecurity> authMethods = config.fromSecurity(securitySchemeMap);
+        if (authMethods != null && !authMethods.isEmpty()) {
+            bundle.put("authMethods", authMethods);
+            bundle.put("hasAuthMethods", true);
+        }
+    }
+
 }

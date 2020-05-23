@@ -3,8 +3,6 @@ package io.swagger.model;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
@@ -15,12 +13,6 @@ import javax.validation.constraints.*;
  * Animal
  */
 @Validated
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "className", visible = true )
-@JsonSubTypes({
-  @JsonSubTypes.Type(value = Dog.class, name = "Dog"),
-  @JsonSubTypes.Type(value = Cat.class, name = "Cat"),
-})
-
 public class Animal   {
   @JsonProperty("className")
   private String className = null;
@@ -38,10 +30,9 @@ public class Animal   {
    * @return className
   **/
   @ApiModelProperty(required = true, value = "")
-  @NotNull
+      @NotNull
 
-
-  public String getClassName() {
+    public String getClassName() {
     return className;
   }
 
@@ -59,9 +50,8 @@ public class Animal   {
    * @return color
   **/
   @ApiModelProperty(value = "")
-
-
-  public String getColor() {
+  
+    public String getColor() {
     return color;
   }
 
@@ -110,4 +100,3 @@ public class Animal   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

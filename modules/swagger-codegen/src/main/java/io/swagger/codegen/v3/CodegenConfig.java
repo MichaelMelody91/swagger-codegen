@@ -233,4 +233,16 @@ public interface CodegenConfig {
     List<CodegenArgument> getLanguageArguments();
 
     void setLanguageArguments(List<CodegenArgument> codegenArguments);
+
+    boolean needsUnflattenedSpec();
+
+    void setUnflattenedOpenAPI(OpenAPI unflattenedOpenAPI);
+
+    boolean getIgnoreImportMapping();
+
+    void setIgnoreImportMapping(boolean ignoreImportMapping);
+
+    boolean defaultIgnoreImportMappingOption();
+
+    ISchemaHandler getSchemaHandler();
 }

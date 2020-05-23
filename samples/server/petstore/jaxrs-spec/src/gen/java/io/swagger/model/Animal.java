@@ -1,7 +1,5 @@
 package io.swagger.model;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.io.Serializable;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -12,7 +10,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class Animal  implements Serializable {
+public class Animal  implements Serializable  {
   private @Valid String className = null;
   private @Valid String color = "red";
 

@@ -10,11 +10,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * A category for a pet
+ * Category
  */
-@ApiModel(description = "A category for a pet")
 @Validated
-
 public class Category   {
   @JsonProperty("id")
   private Long id = null;
@@ -32,9 +30,8 @@ public class Category   {
    * @return id
   **/
   @ApiModelProperty(value = "")
-
-
-  public Long getId() {
+  
+    public Long getId() {
     return id;
   }
 
@@ -52,9 +49,8 @@ public class Category   {
    * @return name
   **/
   @ApiModelProperty(value = "")
-
-
-  public String getName() {
+  
+    public String getName() {
     return name;
   }
 
@@ -103,4 +99,3 @@ public class Category   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

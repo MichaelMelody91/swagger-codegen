@@ -290,6 +290,49 @@ paths:
       - petstore_auth:
         - write:pets
         - read:pets
+  /randomPet:
+    get:
+      tags:
+      - pet
+      operationId: getRandomPet
+      responses:
+        '200':
+          description: "a single random pet"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SinglePetResponse'
+  /allPets:
+    get:
+      tags:
+      - pet
+      operationId: getAllPets
+      responses:
+        '200':
+          description: "a single random pet"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllPetsResponse'
+
+  /pet/category:
+    post:
+      tags:
+        - pet
+      operationId: doCategoryStuff
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubCategory'
+
   /store/inventory:
     get:
       tags:
@@ -1247,7 +1290,7 @@ paths:
       summary: Updates a dog
       operationId: updateDogWithForm
       parameters:
-      - name: animalId
+      - name: dogId
         in: path
         description: ID of dog that needs to be updated
         required: true
@@ -1787,6 +1830,58 @@ components:
         - name: "name"
           id: 1
         status: "available"
+
+    NullableEnumModel:
+      type: object
+      properties:
+        enumProp:
+          type: string
+          nullable: true
+          enum:
+            - a
+            - b
+            - null
+    SinglePetResponse:
+      type: object
+      properties:
+        pet:
+          oneOf:
+            - $ref: "#/components/schemas/Dog"
+            - $ref: "#/components/schemas/Cat"
+          discriminator:
+            propertyName: pet_type
+    AllPetsResponse:
+      type: array
+      items:
+        oneOf:
+          - $ref: "#/components/schemas/Dog"
+          - $ref: "#/components/schemas/Cat"
+        discriminator:
+          propertyName: pet_type
+    SubCategory:
+      type: object
+      properties:
+        category:
+          allOf:
+            - $ref: '#/components/schemas/Category'
+            - type: object
+              properties:
+                foo:
+                  type: boolean
+                bar:
+                  type: integer
+                beer:
+                  type: string
+                drunk:
+                  $ref: '#/components/schemas/User'
+        category2:
+          $ref: '#/components/schemas/Category'
+        pets:
+          type: array
+          items:
+            allOf:
+              - $ref: "#/components/schemas/Pet"
+
     hasOnlyReadOnly:
       type: object
       properties:

@@ -65,7 +65,9 @@ public class DogApi {
 
         final String[] accepts = {  };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
-        final String[] contentTypes = {  };
+        final String[] contentTypes = { 
+            "application/json", "application/xml"
+         };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
 
         String[] authNames = new String[] {  };
@@ -133,7 +135,9 @@ public class DogApi {
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
 
-        final String[] accepts = {  };
+        final String[] accepts = { 
+            "application/xml", "application/json"
+         };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
         final String[] contentTypes = {  };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
@@ -166,7 +170,9 @@ public class DogApi {
 
         final String[] accepts = {  };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
-        final String[] contentTypes = {  };
+        final String[] contentTypes = { 
+            "application/json", "application/xml"
+         };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
 
         String[] authNames = new String[] {  };
@@ -178,20 +184,20 @@ public class DogApi {
      * Updates a dog
      * 
      * <p><b>405</b> - Invalid input
-     * @param animalId ID of dog that needs to be updated
+     * @param dogId ID of dog that needs to be updated
      * @param name The name parameter
      * @param status The status parameter
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void updateDogWithForm(Long animalId, String name, String status) throws RestClientException {
+    public void updateDogWithForm(Long dogId, String name, String status) throws RestClientException {
         Object postBody = null;
-        // verify the required parameter 'animalId' is set
-        if (animalId == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'animalId' when calling updateDogWithForm");
+        // verify the required parameter 'dogId' is set
+        if (dogId == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'dogId' when calling updateDogWithForm");
         }
         // create path and map variables
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("animalId", animalId);
+        uriVariables.put("dogId", dogId);
         String path = UriComponentsBuilder.fromPath("/dog/{dogId}").buildAndExpand(uriVariables).toUriString();
         
         final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
@@ -204,7 +210,9 @@ public class DogApi {
 
         final String[] accepts = {  };
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
-        final String[] contentTypes = {  };
+        final String[] contentTypes = { 
+            "application/x-www-form-urlencoded"
+         };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
 
         String[] authNames = new String[] {  };

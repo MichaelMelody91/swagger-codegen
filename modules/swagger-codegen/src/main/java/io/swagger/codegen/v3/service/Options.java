@@ -36,6 +36,11 @@ public class Options {
     private Boolean removeOperationIdPrefix;
     private Boolean skipOverride;
     private String outputDir = "";
+    private Boolean resolveFully;
+
+    private Map<String, String> codegenArguments = new LinkedHashMap<>();
+
+    private boolean flattenInlineComposedSchemas = false;
 
     public Options authorizationValue(AuthorizationValue authorizationValue) {
         this.authorizationValue = authorizationValue;
@@ -210,6 +215,25 @@ public class Options {
         this.importMappings.put(key, value);
         return this;
     }
+
+    public Options codegenArguments(Map<String, String> codegenArguments) {
+        this.codegenArguments = codegenArguments;
+        return this;
+    }
+
+    public Map<String, String> getCodegenArguments() {
+        return codegenArguments;
+    }
+
+    public void setCodegenArguments(Map<String, String> codegenArguments) {
+        this.codegenArguments = codegenArguments;
+    }
+
+    public Options addCodegenArgument(String key, String value) {
+        this.codegenArguments.put(key, value);
+        return this;
+    }
+
 
     public Options invokerPackage(String invokerPackage) {
         this.invokerPackage = invokerPackage;
@@ -406,5 +430,29 @@ public class Options {
 
     public void setSkipOverride(Boolean skipOverride) {
         this.skipOverride = skipOverride;
+    }
+
+    public Options resolveFully(Boolean resolveFully) {
+        this.resolveFully = resolveFully;
+        return this;
+    }
+
+    public Boolean getResolveFully() {
+        return resolveFully;
+    }
+
+    public void setResolveFully(Boolean resolveFully) {
+        this.resolveFully = resolveFully;
+    }
+
+    public boolean isFlattenInlineComposedSchemas() {
+        return flattenInlineComposedSchemas;
+    }
+    public void setFlattenInlineComposedSchema(boolean flattenInlineComposedSchemas) {
+        this.flattenInlineComposedSchemas = flattenInlineComposedSchemas;
+    }
+    public Options flattenInlineComposedSchema(boolean flattenInlineComposedSchemas) {
+        this.flattenInlineComposedSchemas = flattenInlineComposedSchemas;
+        return this;
     }
 }
